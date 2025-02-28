@@ -1,0 +1,44 @@
+{
+  "name": "printify-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "CHOKIDAR_USEPOLLING=true react-scripts start"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@fontsource/pacifico": "^4.1.0",
+    "@fontsource/rubik": "^4.1.1",
+    "axios": "^1.7.9",
+    "bootstrap": "^4.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "next": "10.0.6",
+    "next-images": "^1.7.0",
+    "react": "17.0.1",
+    "react-bootstrap": "^1.4.3",
+    "react-circular-progressbar": "^2.0.3",
+    "react-dom": "17.0.1",
+    "react-icons": "^5.4.0",
+    "react-modal-video": "^1.2.6",
+    "react-router-dom": "^6.29.0",
+    "react-scroll": "^1.8.1",
+    "sqlite3": "^5.1.7",
+    "swiper": "^6.4.10"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@babel/preset-env": "^7.26.7",
+    "autoprefixer": "^10.4.20",
+    "css-loader": "^6.11.0",
+    "file-loader": "^6.2.0",
+    "postcss": "^8.5.2",
+    "sass-loader": "^13.3.3",
+    "style-loader": "^3.3.4",
+    "tailwindcss": "^4.0.6",
+    "url-loader": "^4.1.1"
+  }
+}
