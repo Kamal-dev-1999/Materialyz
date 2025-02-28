@@ -7,7 +7,7 @@ import Footer from "@/components/footer";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({
-    role: 'buyer', // default value is buyer
+    role: '', // default value is buyer
     username: '',
     password: '',
   });
@@ -240,6 +240,35 @@ const Login = () => {
                 font-size: 1.25rem;
                 color: orange;
               }
+
+              .user-type-radio-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 20px;       /* Space between elements */
+                margin-bottom: 1rem;
+                margin-left: 50px;
+              }
+
+              .login-as-label {
+                font-size: 18px;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 10px;
+              }
+
+              .user-type-radio-wrapper label {
+                display: flex;
+                align-items: center;
+                font-size: 18px;
+                color: #333;
+                cursor: pointer;
+              }
+
+              .user-type-radio-wrapper input[type="radio"] {
+                margin-right: 8px;
+                accent-color: #f57224;  /* Modern browsers only */
+              }
+
         `}
       </style>
       <MenuContextProvider>
@@ -249,7 +278,7 @@ const Login = () => {
             <h2 className="form-title" style={{ color: "orangered" }}>Log in</h2>
             <form onSubmit={handleSubmit} className="login-form">
               {/* Dropdown for selecting role */}
-              <div className="user-type-dropdown-wrapper">
+              {/* <div className="user-type-dropdown-wrapper">
                 <select
                   name="role"
                   value={loginData.role}
@@ -261,7 +290,33 @@ const Login = () => {
                   <option value="buyer">Buyer</option>
                   <option value="seller">Seller</option>
                 </select>
+              </div> */}
+              <div className="user-type-radio-wrapper">
+                <span className="login-as-label">Login as:</span>
+                <label>
+                  <input
+                    type="radio"
+                    name="role"
+                    value="buyer"
+                    checked={loginData.role === "buyer"}
+                    onChange={handleChange}
+                    required
+                  />
+                  Buyer
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="role"
+                    value="seller"
+                    checked={loginData.role === "seller"}
+                    onChange={handleChange}
+                    required
+                  />
+                  Seller
+                </label>
               </div>
+
               <div className="input-wrapper">
                 <input
                   type="text"

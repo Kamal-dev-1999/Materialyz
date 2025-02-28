@@ -27,6 +27,19 @@ const BuyerProfile = () => {
   const [profileData, setProfileData] = useState(null);
   const [errorProfile, setErrorProfile] = useState("");
 
+  // New state for the search query
+  const [searchQuery, setSearchQuery] = useState("");
+  // New state for toggling the account menu dropdown
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+
+  // Helper function to check if a card's title matches the search query.
+  const shouldDisplayCard = (cardTitle) => {
+    return (
+      searchQuery === "" ||
+      cardTitle.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
   // Check if the buyer is logged in
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -62,14 +75,21 @@ const BuyerProfile = () => {
     }
   }, []);
 
+  // Function to handle logout: clear tokens and redirect to home page
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_role");
+    router.push("/");
+  };
+
   if (loading || loadingProfile) return <p>Loading profile...</p>;
   if (errorProfile) return <p>{errorProfile}</p>;
 
   // Destructure user and profile from the fetched data
   const { user, profile } = profileData;
-
   // Use a fallback image if profile_picture is not provided
-  const profilePicture = profile.profile_picture || "https://via.placeholder.com/80";
+  const profilePicture =
+    profile.profile_picture || "https://via.placeholder.com/80";
 
   return (
     <div style={styles.container}>
@@ -82,7 +102,7 @@ const BuyerProfile = () => {
         {/* Logo / Brand */}
         <div style={styles.logoBox}>
           <img
-            src={profilePicture} // "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            src={profilePicture}
             alt="materialyz.com"
             style={styles.logoImg}
           />
@@ -156,12 +176,30 @@ const BuyerProfile = () => {
           {/* Center: Search Bar */}
           <div style={styles.searchContainer}>
             <FaSearch style={styles.searchIcon} />
-            <input type="text" placeholder="Search..." style={styles.searchInput} />
+            <input
+              type="text"
+              placeholder="Search..."
+              style={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           {/* Right: Icons */}
           <div style={styles.iconGroup}>
             <FaBell style={styles.iconStyle} />
-            <FaUserCircle style={styles.iconStyle} />
+            <div style={{ position: "relative" }}>
+              <FaUserCircle
+                style={styles.iconStyle}
+                onClick={() => setShowAccountMenu(!showAccountMenu)}
+              />
+              {showAccountMenu && (
+                <div style={styles.accountMenu}>
+                  <button onClick={handleLogout} style={styles.logoutButton}>
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -222,7 +260,7 @@ const BuyerProfile = () => {
                     marginRight: index < arr.length - 1 ? "40px" : 0
                   }}
                 >
-                <div style={{ marginRight: "40px" }}>{item.icon}</div>
+                  <div style={{ marginRight: "40px" }}>{item.icon}</div>
                   <div style={styles.statsTextContainer}>
                     <p style={styles.statsNumber}>0</p>
                     <p style={styles.statsLabel}>{item.label}</p>
@@ -232,110 +270,143 @@ const BuyerProfile = () => {
             </div>
           </div>
 
+          {/* Cards Section */}
           <div style={styles.cardsOrdersGrid}>
-            {/* Live Orders */}
-            <div style={styles.cardOrders}>
-              <div style={styles.cardHeader}>
-                <h3 style={styles.cardTitle}>Live Orders</h3>
-                <p style={styles.viewAll}>View All</p>
-              </div>
-              <div style={styles.cardBody}>
-                <p style={styles.noOrdersText}>No Live Orders Found</p>
-                <img src="https://www.biznurture.com/images/not_eligible.png" alt="Live Orders" style={styles.cardImage} />
-              </div>
-            </div>
-
-            {/* Profile Card */}
-            <div style={styles.profileCard}>
-              <h3 style={styles.profileCardTitle}>Profile</h3>
-              <div style={styles.profileProgressContainer}>
-                <svg width="100" height="100">
-                  <circle cx="50" cy="50" r="40" style={styles.progressBg} />
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    style={styles.progressBar}
-                    strokeDasharray="251.2"
-                    strokeDashoffset="188.4"
+            {/* Live Orders Card */}
+            {shouldDisplayCard("live orders") && (
+              <div style={styles.cardOrders}>
+                <div style={styles.cardHeader}>
+                  <h3 style={styles.cardTitle}>Live Orders</h3>
+                  <p style={styles.viewAll}>View All</p>
+                </div>
+                <div style={styles.cardBody}>
+                  <p style={styles.noOrdersText}>No Live Orders Found</p>
+                  <img
+                    src="https://www.biznurture.com/images/not_eligible.png"
+                    alt="Live Orders"
+                    style={styles.cardImage}
                   />
-                </svg>
-                <div style={styles.profileProgressText}>
-                  <p>Status</p>
-                  <p style={styles.profileStatusNumber}>1 of 4</p>
                 </div>
               </div>
-              <ul style={styles.profileList}>
-                <li>
-                  <FaCheckCircle style={{ ...styles.profileIcon, ...styles.profileIconCheck }} /> Company Details Added
-                </li>
-                <li>
-                  <FaExclamationCircle style={{ ...styles.profileIcon, ...styles.profileIconWarning }} /> Certifications Pending
-                </li>
-                <li>
-                  <FaRegCircle style={{ ...styles.profileIcon, ...styles.profileIconPending }} /> RFQs Pending
-                </li>
-                <li>
-                  <FaRegCircle style={{ ...styles.profileIcon, ...styles.profileIconPending }} /> Industries & Products Pending
-                </li>
-              </ul>
-              <a href="/dashboard" style={styles.profilePrimaryButton}>Complete your Profile</a>
-            </div>
+            )}
+
+            {/* Profile Card */}
+            {shouldDisplayCard("profile") && (
+              <div style={styles.profileCard}>
+                <h3 style={styles.profileCardTitle}>Profile</h3>
+                <div style={styles.profileProgressContainer}>
+                  <svg width="100" height="100">
+                    <circle cx="50" cy="50" r="40" style={styles.progressBg} />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      style={styles.progressBar}
+                      strokeDasharray="251.2"
+                      strokeDashoffset="188.4"
+                    />
+                  </svg>
+                  <div style={styles.profileProgressText}>
+                    <p>Status</p>
+                    <p style={styles.profileStatusNumber}>1 of 4</p>
+                  </div>
+                </div>
+                <ul style={styles.profileList}>
+                  <li>
+                    <FaCheckCircle style={{ ...styles.profileIcon, ...styles.profileIconCheck }} /> Company Details Added
+                  </li>
+                  <li>
+                    <FaExclamationCircle style={{ ...styles.profileIcon, ...styles.profileIconWarning }} /> Certifications Pending
+                  </li>
+                  <li>
+                    <FaRegCircle style={{ ...styles.profileIcon, ...styles.profileIconPending }} /> RFQs Pending
+                  </li>
+                  <li>
+                    <FaRegCircle style={{ ...styles.profileIcon, ...styles.profileIconPending }} /> Industries & Products Pending
+                  </li>
+                </ul>
+                <a href="/dashboard" style={styles.profilePrimaryButton}>
+                  Complete your Profile
+                </a>
+              </div>
+            )}
           </div>
 
           <div style={styles.cardsGrid}>
             {/* Open RFQs Card */}
-            <div style={styles.card}>
-              <div style={styles.cardHeader}>
-                <h3 style={styles.cardTitle}>Open RFQs</h3>
-                <p style={styles.viewAll}>View All</p>
+            {shouldDisplayCard("open rfqs") && (
+              <div style={styles.card}>
+                <div style={styles.cardHeader}>
+                  <h3 style={styles.cardTitle}>Open RFQs</h3>
+                  <p style={styles.viewAll}>View All</p>
+                </div>
+                <div style={styles.cardBody}>
+                  <p style={styles.noOrdersText}>No Open RFQs Found</p>
+                  <img
+                    src="https://pwa-cdn.freecharge.in/pwa-static/pwa/images/blogs/no-post-found.svg"
+                    alt="Open RFQs"
+                    style={styles.cardImage}
+                  />
+                </div>
               </div>
-              <div style={styles.cardBody}>
-                <p style={styles.noOrdersText}>No Open RFQs Found</p>
-                <img
-                  src="https://pwa-cdn.freecharge.in/pwa-static/pwa/images/blogs/no-post-found.svg"
-                  alt="Open RFQs"
-                  style={styles.cardImage}
-                />
-              </div>
-            </div>
+            )}
 
             {/* Manage Buyers Card */}
-            <div style={styles.manageBuyersCard}>
-              <div style={styles.manageBuyersText}>
-                <h3 style={styles.cardTitle}>Manage your Buyers</h3>
-                <ul style={styles.list}>
-                  <li style={styles.listItem}>✅ Onboard buyers</li>
-                  <li style={styles.listItem}>✅ Share quotes with buyers</li>
-                  <li style={styles.listItem}>✅ View buyer reports</li>
-                </ul>
-                <a href="/dashboard" style={styles.buyerButton}>Go to buyer library</a>
+            {shouldDisplayCard("manage your buyers") && (
+              <div style={styles.manageBuyersCard}>
+                <div style={styles.manageBuyersText}>
+                  <h3 style={styles.cardTitle}>Manage your Buyers</h3>
+                  <ul style={styles.list}>
+                    <li style={styles.listItem}>✅ Onboard buyers</li>
+                    <li style={styles.listItem}>✅ Share quotes with buyers</li>
+                    <li style={styles.listItem}>✅ View buyer reports</li>
+                  </ul>
+                  <a href="/dashboard" style={styles.buyerButton}>
+                    Go to buyer library
+                  </a>
+                </div>
+                <img
+                  src="https://webhead.at/wp-content/uploads/2024/02/customer-relationship-management-animate.svg"
+                  alt="Manage Buyers"
+                  style={styles.manageBuyersImage}
+                />
               </div>
-              <img src="https://webhead.at/wp-content/uploads/2024/02/customer-relationship-management-animate.svg" alt="Manage Buyers" style={styles.manageBuyersImage} />
-            </div>
+            )}
 
             {/* Manage Capabilities Card */}
-            <div style={styles.manageCapabilityCard}>
-              <img
-                src="https://ultravux.com/images/Onemage.svg"
-                alt="Manage your Capability"
-                style={styles.manageCapabilityImage}
-              />
-              <div style={styles.manageCapabilityText}>
-                <h3 style={styles.cardCapabilityTitle}>Manage your Capabilities</h3>
-                <p style={styles.noOrdersText}>Add your Material and Finishing Capabilities</p>
-                <a href="/dashboard" style={styles.capabilityButton}>Go to Capabilities</a>
+            {shouldDisplayCard("manage your capabilities") && (
+              <div style={styles.manageCapabilityCard}>
+                <img
+                  src="https://ultravux.com/images/Onemage.svg"
+                  alt="Manage your Capability"
+                  style={styles.manageCapabilityImage}
+                />
+                <div style={styles.manageCapabilityText}>
+                  <h3 style={styles.cardCapabilityTitle}>Manage your Capabilities</h3>
+                  <p style={styles.noOrdersText}>
+                    Add your Material and Finishing Capabilities
+                  </p>
+                  <a href="/dashboard" style={styles.capabilityButton}>
+                    Go to Capabilities
+                  </a>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Recent Activities Card */}
-            <div style={styles.card}>
-              <h3 style={styles.cardTitle}>Recent Activities</h3>
-              <div style={styles.cardBody}>
-                <p style={styles.noOrdersText}>No Recent Activities</p>
-                <img src="https://img.freepik.com/premium-vector/folder-concept-no-data-corrupted-data-with-characters-confused-with-missing-missing-files_675567-3308.jpg" alt="Recent Activities" style={styles.cardImage} />
+            {shouldDisplayCard("recent activities") && (
+              <div style={styles.card}>
+                <h3 style={styles.cardTitle}>Recent Activities</h3>
+                <div style={styles.cardBody}>
+                  <p style={styles.noOrdersText}>No Recent Activities</p>
+                  <img
+                    src="https://img.freepik.com/premium-vector/folder-concept-no-data-corrupted-data-with-characters-confused-with-missing-missing-files_675567-3308.jpg"
+                    alt="Recent Activities"
+                    style={styles.cardImage}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -371,7 +442,8 @@ const styles = {
   logoImg: {
     width: "40px",
     height: "40px",
-    objectFit: "contain"
+    objectFit: "contain",
+    borderRadius:"50%"
   },
   nav: {
     display: "flex",
@@ -553,8 +625,9 @@ const styles = {
   },
   pageTitle: {
     fontSize: "16px",
-    color: "#4b5563",
-    marginLeft: "10px"
+    color: "	#696969",
+    marginLeft: "10px",
+    fontWeight: "700"
   },
   searchContainer: {
     display: "flex",
@@ -955,6 +1028,27 @@ const styles = {
   manageCapabilityImage: {
     width: "40%",
   },
+
+  accountMenu: {
+    position: "absolute",
+    top: "40px",
+    right: 0,
+    background: "#fff",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    padding: "5px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+    zIndex: 1001
+  },
+  logoutButton: {
+    background: "transparent",
+    border: "none",
+    color: "#333",
+    cursor: "pointer",
+    padding: "5px 10px",
+    width: "100%",
+    textAlign: "left"
+  }
   
 };
 
